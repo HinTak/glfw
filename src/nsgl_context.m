@@ -313,7 +313,7 @@ GLFWbool _glfwCreateContextNSGL(_GLFWwindow* window,
     {
         _glfwInputError(GLFW_FORMAT_UNAVAILABLE,
                         "NSGL: Failed to find a suitable pixel format");
-        return GLFW_FALSE;
+        //return GLFW_FALSE;
     }
 
     NSOpenGLContext* share = nil;
