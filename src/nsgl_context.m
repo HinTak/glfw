@@ -200,13 +200,25 @@ GLFWbool _glfwCreateContextNSGL(_GLFWwindow* window,
     assert((size_t) index < sizeof(attribs) / sizeof(attribs[0])); \
     attribs[index++] = a; \
 }
+#define DELETE_ATTRIB(a) \
+{ \
+    assert(index > 0); \
+    int i = 0; \
+    while (attribs[i] != a && i < index) i++; \
+    if (i < index) { \
+        index--; \
+        while(i < index) { \
+            attribs[i] = attribs[i+1]; \
+            i++; \
+        } \
+    } \
+}
 #define SET_ATTRIB(a, v) { ADD_ATTRIB(a); ADD_ATTRIB(v); }
 
     NSOpenGLPixelFormatAttribute attribs[40];
     int index = 0;
 
-//    ADD_ATTRIB(NSOpenGLPFAAccelerated);
-    ADD_ATTRIB(NSOpenGLPFARendererID);ADD_ATTRIB(kCGLRendererGenericFloatID);
+    ADD_ATTRIB(NSOpenGLPFAAccelerated);
     ADD_ATTRIB(NSOpenGLPFAClosestPolicy);
 
     if (ctxconfig->nsgl.offline)
@@ -305,17 +317,29 @@ GLFWbool _glfwCreateContextNSGL(_GLFWwindow* window,
 
     ADD_ATTRIB(0);
 
-#undef ADD_ATTRIB
-#undef SET_ATTRIB
-
     window->context.nsgl.pixelFormat =
         [[NSOpenGLPixelFormat alloc] initWithAttributes:attribs];
     if (window->context.nsgl.pixelFormat == nil)
     {
-        _glfwInputError(GLFW_FORMAT_UNAVAILABLE,
-                        "NSGL: Failed to find a suitable pixel format");
-        return GLFW_FALSE;
+        // Re-try with Software Renderer
+        DELETE_ATTRIB(NSOpenGLPFAAccelerated);
+        DELETE_ATTRIB(0); // Unterminate.
+        ADD_ATTRIB(NSOpenGLPFARendererID);
+        ADD_ATTRIB(kCGLRendererGenericFloatID);
+        ADD_ATTRIB(0);
+        window->context.nsgl.pixelFormat =
+            [[NSOpenGLPixelFormat alloc] initWithAttributes:attribs];
+        if (window->context.nsgl.pixelFormat == nil)
+        {
+            _glfwInputError(GLFW_FORMAT_UNAVAILABLE,
+                            "NSGL: Failed to find a suitable pixel format");
+            return GLFW_FALSE;
+        }
     }
+
+#undef ADD_ATTRIB
+#undef DELETE_ATTRIB
+#undef SET_ATTRIB
 
     NSOpenGLContext* share = nil;
 
