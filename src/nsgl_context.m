@@ -213,6 +213,13 @@ GLFWbool _glfwCreateContextNSGL(_GLFWwindow* window,
         } \
     } \
 }
+#define DELETE_TERMINATING_NULL \
+{ \
+    assert(index > 0); \
+    if (attribs[index-1] == 0) { \
+        index--; \
+    } \
+}
 #define SET_ATTRIB(a, v) { ADD_ATTRIB(a); ADD_ATTRIB(v); }
 
     NSOpenGLPixelFormatAttribute attribs[40];
@@ -315,7 +322,7 @@ GLFWbool _glfwCreateContextNSGL(_GLFWwindow* window,
     // NOTE: All NSOpenGLPixelFormats on the relevant cards support sRGB
     //       framebuffer, so there's no need (and no way) to request it
 
-    ADD_ATTRIB(0);
+    ADD_ATTRIB(0); // See also DELETE_TERMINATING_NULL!
 
     window->context.nsgl.pixelFormat =
         [[NSOpenGLPixelFormat alloc] initWithAttributes:attribs];
@@ -323,10 +330,10 @@ GLFWbool _glfwCreateContextNSGL(_GLFWwindow* window,
     {
         // Re-try with Software Renderer
         DELETE_ATTRIB(NSOpenGLPFAAccelerated);
-        DELETE_ATTRIB(0); // Unterminate.
+        DELETE_TERMINATING_NULL; // Unterminate.
         ADD_ATTRIB(NSOpenGLPFARendererID);
         ADD_ATTRIB(kCGLRendererGenericFloatID);
-        ADD_ATTRIB(0);
+        ADD_ATTRIB(0); // Re-terminate.
         window->context.nsgl.pixelFormat =
             [[NSOpenGLPixelFormat alloc] initWithAttributes:attribs];
         if (window->context.nsgl.pixelFormat == nil)
@@ -339,6 +346,7 @@ GLFWbool _glfwCreateContextNSGL(_GLFWwindow* window,
 
 #undef ADD_ATTRIB
 #undef DELETE_ATTRIB
+#undef DELETE_TERMINATING_NULL
 #undef SET_ATTRIB
 
     NSOpenGLContext* share = nil;
