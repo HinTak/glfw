@@ -43,9 +43,9 @@ jobs:
             - name: Build Wayland+X11 static library
               run: cmake --build build-full-static --parallel
             - run: xvfb-run ./build-full-static/examples/offscreen
+            - run: ./build-full-static/examples/offscreen
             - run: xvfb-run ./build-full-static/tests/glfwinfo --renderer=sw
             - run: ./build-full-static/tests/glfwinfo --renderer=sw
-            - run: ./build-full-static/examples/offscreen
             - run: ./build-full-static/tests/glfwinfo
 
             - name: Configure Wayland+X11 shared library
