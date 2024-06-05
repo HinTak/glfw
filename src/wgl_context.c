@@ -179,7 +179,7 @@ static int choosePixelFormatWGL(_GLFWwindow* window,
                 if (FIND_ATTRIB_VALUE(WGL_ACCELERATION_ARB) !=
                     WGL_NO_ACCELERATION_ARB)
                 {
-                    continue;
+//                    continue;
                 }
             }
 
@@ -262,7 +262,7 @@ static int choosePixelFormatWGL(_GLFWwindow* window,
                 if ((pfd.dwFlags & PFD_GENERIC_ACCELERATED) &&
                     !(pfd.dwFlags & PFD_GENERIC_FORMAT))
                 {
-                    continue;
+//                    continue;
                 }
             }
 
