@@ -1012,6 +1012,7 @@ int main(int argc, char** argv)
 
         if (vkCreateInstance(&ici, NULL, &instance) != VK_SUCCESS)
         {
+            printf("vkCreateInstance failed\n");
             glfwTerminate();
             exit(EXIT_FAILURE);
         }
