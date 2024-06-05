@@ -202,8 +202,11 @@ GLFWbool _glfwCreateContextNSGL(_GLFWwindow* window,
     assert((size_t) index < sizeof(attribs) / sizeof(attribs[0])); \
     attribs[index++] = a; \
 }
+// DELETE_ATTRIB checks a !=0, as SET_ATTRIB(x,0) are used, and needs
+// a special UNSET_ATTRIB(x,0), instead of "DELETE_ATTRIB(x); DELETE_ATTRIB(0)"
 #define DELETE_ATTRIB(a) \
 { \
+    assert(a != 0); \
     assert(index > 0); \
     int i = 0; \
     while (attribs[i] != a && i < index) i++; \
