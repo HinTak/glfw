@@ -42,6 +42,8 @@ jobs:
               run: cmake -B build-full-static -D GLFW_BUILD_WAYLAND=ON -D GLFW_BUILD_X11=ON
             - name: Build Wayland+X11 static library
               run: cmake --build build-full-static --parallel
+            - run: xvfb-run ./build-full-static/tests/glfwinfo --renderer=sw
+            - run: xvfb-run ./build-full-static/examples/offscreen
             - run: ./build-full-static/tests/glfwinfo --renderer=sw
             - run: ./build-full-static/examples/offscreen
             - run: ./build-full-static/tests/glfwinfo
